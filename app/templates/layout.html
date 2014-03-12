@@ -1,30 +1,35 @@
-<!DOCTYPE html>
-<html>
+<!DOCTYPE HTML PUBLIC "-//W3C/DTD HTML 4.01//EN">
+<html lang="en">
+<html xmlns="http://www.w3.org/1999/xhtml">
   <head>
-      <title>Flask App</title>   
-      <strong> <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css')}}"></strong>
+      {% block head %}
+      <title>{% block title %}{% endblock %} - Chris Dorman's Webpage</title>
+      <strong><link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}"></strong>
+      {% endblock %}
   </head>
+
   <body>
-   
     <header>
       <div class="container">
-          <h1 class="logo">Flask App</h1>
-          <strong>
-              <nav>
+          <h1 class="logo">Chris Dorman Profile Page</h1>
+          <strong><nav>
             <ul class="menu">
               <li><a href="{{ url_for('home') }}">Home</a></li>
               <li><a href="{{ url_for('about') }}">About</a></li>
             </ul>
-              </nav>
-          </strong>
+          </nav></strong>
       </div>
-    </header> 
-     
+    </header>
+  
     <div class="container">
-      {% block content %}
-      {% endblock %}
+        {% block content %}
+        {% endblock %} 
     </div>
-     
+ 
+    <div id="footer">
+        {% block footer %}
+        &copy; Copyright 2014 by <a href="http://domain.invalid/">Chris Dorman</a>
+        {% endblock %}
+    </div>
   </body>
 </html>
-
