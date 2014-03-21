@@ -1,11 +1,12 @@
 
-#import sys
+import sys
 #import MySQLdb
-#import locale
-#import lxml.html
+#import sqlalchemy
+import locale
+import lxml.html
 from flask import Flask, render_template, request, redirect 
 
-#locale.setlocale(locale.LC_ALL, '')
+locale.setlocale(locale.LC_ALL, '')
 
 #NOTE: this script was written in Python 2.7 some of the string formatting may not
 #translate when used with older versions 
@@ -21,8 +22,21 @@ if sys.stderr.encoding != 'UTF-8':
 
 app = Flask(__name__)
 
+#engine = create_engine('sqlite:///:memory:', echo=True)
+#
+#Base = declarative_base()
+#
+#class User(Base):
+#    __table__ = 'history.pos_matrix'
+#
+#    id = Column
+#
 
-def db_connect(symbol):
+
+
+
+def db_con(symbol):
+    
     
     #db = MySQLdb.connect(host = "cer-emdbl2",
     #                     user = "tclerk",
@@ -39,7 +53,7 @@ def db_connect(symbol):
     
     #row = cur.fetchone()
     #vol = int(row[0])
-    vol = 132000
+    vol = 1000000  
     return vol
         
 
@@ -47,30 +61,20 @@ def web_scraper(symbol):
     url = ('http://finance.yahoo.com/q?s=' + symbol)
     doc = lxml.html.parse(url)
     #find the first table contaning any tr and a td with class yfnc_tabledata1
-    table = doc.xpath("//table[tr/td[@class='yfnc_tabledata1']]")[1] 
-    print "***" * 10
-    print "Symbol: " + str.upper(symbol)
-         
+    table = doc.xpath("//table[tr/td[@class='yfnc_tabledata1']]")[1]        
     text = []   
     for tr in table.xpath('./tr'):
         text.append(tr.text_content())
     split_txt = [i.split(':') for i in text]
-    av_key = split_txt[3][0]
-    av_val = split_txt[3][1]
-    yvol_key = split_txt[2][0]
-    yvol_val = split_txt[2][1]
-    yvol = yvol_val.replace(',', '')
-    em_vol =  db_connect(symbol) 
-    market_share = float(em_vol) / int(yvol) * 100
-    return market_share
-    
-    #print "%s: %s" % (av_key, av_val)
-    #print "%s: %s" % (yvol_key, yvol_val)
-    #print "EM Total Volume:", locale.format('%d', em_vol, 1)
-    #print "EM Market Share: %.2f%%" % (market_share)
-    #print "***" * 10
-
-
+    em_vol =  db_con(symbol) 
+    ms = float(em_vol) / int(split_txt[2][1].replace(',', '')) * 100
+    symbol = str(symbol)
+    sym = "Symbol: %s" % (str.upper(symbol))
+    avg_vol =  "%s: %s" % (split_txt[3][0], split_txt[3][1])
+    sym_vol = "%s: %s" % (split_txt[2][0], split_txt[2][1])
+    em_tvol = "EM Total Volume: %s" % (locale.format('%d', em_vol, 1))
+    market_share = "EM Market Share: %.2f%%" % (ms)
+    return sym, avg_vol, sym_vol, em_tvol, market_share
 
 
 @app.route('/')
@@ -85,18 +89,16 @@ def home():
 
 @app.route('/about')
 def about():
-    market_share = webscraper(symbol)
-    return render_template('about.html', market_share=market_share)
+    return render_template('about.html')
 
 
-@app.route('/market_share', methods = ['POST'])
-def market_share():
+@app.route('/marketshare', methods = ['POST'])
+def marketshare():
     symbol = request.form['symbol']
-    print ("The symbol is '" + symbol + "'")
-    return redirect('/')
+    data = web_scraper(symbol)
+    print data
+    return render_template('marketshare.html', data=data, symbol=symbol) 
 
 
 if __name__ == '__main__':
     app.run(debug=True)
-    symbol = request.form['symbol']    
-    web_scraper(symbol) 

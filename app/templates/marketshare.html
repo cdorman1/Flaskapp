@@ -1,0 +1,11 @@
+{% extends "layout.html" %}
+{% block title %}marketshare{% endblock %}
+{% block content %}
+<div class="jumbo">
+<ul>
+{% for items in data %}
+  <li>{{ items }}</li>
+{% endfor %}    
+</ul>
+</div>  
+{% endblock %}
