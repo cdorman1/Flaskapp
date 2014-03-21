@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
       {% block head %}
-      <title>{% block title %}{% endblock %} - Chris Dorman's Webpage</title>
+      <title>{% block title %}{% endblock %} - EM Market Share Page</title>
       <strong><link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}"></strong>
       {% endblock %}
   </head>
@@ -11,11 +11,10 @@
   <body>
     <header>
       <div class="container">
-          <h1 class="logo">Chris Dorman Profile Page</h1>
+          <h1 class="logo">EM Market Share Page</h1>
           <strong><nav>
             <ul class="menu">
               <li><a href="{{ url_for('home') }}">Home</a></li>
-              <li><a href="{{ url_for('about') }}">About</a></li>
             </ul>
           </nav></strong>
       </div>

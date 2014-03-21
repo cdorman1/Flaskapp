@@ -1,15 +1,19 @@
+# -*- coding: utf-8 -*-
 
-import sys
-#import MySQLdb
-#import sqlalchemy
+import MySQLdb
+
 import locale
 import lxml.html
-from flask import Flask, render_template, request, redirect 
+import sqlalchemy as sa
+import sqlalchemy.orm as saorm
+import sqlalchemy.exc as saexc
+import sqlalchemy.ext.declarative as sadec
+from flask import Flask, render_template, request
 
 locale.setlocale(locale.LC_ALL, '')
 
-#NOTE: this script was written in Python 2.7 some of the string formatting may not
-#translate when used with older versions 
+#NOTE: this script was written in Python 2.7 some of the string formatting
+#may not translate when used with older versions 
 
 #Use the code below if the output is something other than UTF-8
 """
@@ -22,15 +26,22 @@ if sys.stderr.encoding != 'UTF-8':
 
 app = Flask(__name__)
 
-#engine = create_engine('sqlite:///:memory:', echo=True)
+#engine = sa.create_engine('mysql://collector:collector@cer-emdbl2/history',
+#        pool_recycle=1800, echo=True)
+#Session = saorm.scoped_session(saorm.sessionmaker(bind=engine))
+#Base = sadec.declarative_base(engine)
 #
-#Base = declarative_base()
 #
-#class User(Base):
+#class Command(Base):
 #    __table__ = 'history.pos_matrix'
 #
-#    id = Column
-#
+#    symbol = sa.Column(sa.String(32), primary_key=False, nullable=False)
+#    buys = sa.Column(sa.String(32), primary_key=False, nullable=False)
+#    sells = sa.Column(sa.String(32), primary_key=False, nullable=False)
+#    TradeDate = sa.Column(sa.DATE, primary_key=True, nullable=False)
+    
+    
+
 
 
 
@@ -38,22 +49,21 @@ app = Flask(__name__)
 def db_con(symbol):
     
     
-    #db = MySQLdb.connect(host = "cer-emdbl2",
-    #                     user = "tclerk",
-    #                     passwd = "flamengo",
-    #                     db = "history")                 
-    #cur = db.cursor()
-    #try:
-    #    cur.execute ("SELECT sum(buys+sells) FROM history.pos_matrix WHERE symbol = \'{0}\' AND tradedate=curdate();".format(symbol)) 
-    #except MySQLdb.Error, e:
-    #    try:
-    #        print "MySQL Error {0}: {1}".format(e.args[0], e.args[1])
-    #    except IndexError:
-    #        print "MySQL Error: {}".format(str(e))
+    db = MySQLdb.connect(host = "cer-emdbl2",
+                         user = "tclerk",
+                         passwd = "flamengo",
+                         db = "history")                 
+    cur = db.cursor()
+    try:
+        cur.execute ("SELECT sum(buys+sells) FROM history.pos_matrix WHERE symbol = \'{0}\' AND tradedate=curdate();".format(symbol)) 
+    except MySQLdb.Error, e:
+        try:
+            print "MySQL Error {0}: {1}".format(e.args[0], e.args[1])
+        except IndexError:
+            print "MySQL Error: {}".format(str(e))
     
-    #row = cur.fetchone()
-    #vol = int(row[0])
-    vol = 1000000  
+    row = cur.fetchone()
+    vol = int(row[0])
     return vol
         
 
@@ -87,9 +97,9 @@ def home():
     return render_template('index.html')
 
 
-@app.route('/about')
-def about():
-    return render_template('about.html')
+#@app.route('/about')
+#def about():
+#    return render_template('about.html')
 
 
 @app.route('/marketshare', methods = ['POST'])
