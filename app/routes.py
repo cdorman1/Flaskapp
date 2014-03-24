@@ -102,12 +102,12 @@ def home():
 #    return render_template('about.html')
 
 
-@app.route('/marketshare', methods = ['POST'])
+@app.route('/', methods = ['POST'])
 def marketshare():
     symbol = request.form['symbol']
     data = web_scraper(symbol)
     print data
-    return render_template('marketshare.html', data=data, symbol=symbol) 
+    return render_template('index.html', data=data, symbol=symbol) 
 
 
 if __name__ == '__main__':
