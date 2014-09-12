@@ -1,3 +1,9 @@
+# Files #
+#########
+*.swp
+*.pyc
+
+
 # Compiled source #
 ###################
 *.com
